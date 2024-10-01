@@ -37,7 +37,7 @@ public class VendasApplication {
             clientesRepository.listarPorNome("Mi").forEach(System.out::println);
 
             System.out.println("---- Deletando todos ----");
-            clienteList.forEach( clientesRepository::deletar);
+            clienteList.forEach(clientesRepository::deletar);
 
             clienteList = clientesRepository.obterTodos();
             System.out.println("---- Resultado ----");

@@ -1,8 +1,19 @@
 package io.github.FeeATo.domain.entity;
 
+import jakarta.persistence.*;
+
+//ao rodar o projeto, ele cria no banco a entidade se n tiver lá
+
+@Entity //diz que isso é uma entidade/tabela para o JPA
+@Table(name = "CLIENTE") //não precisaria pq o nome é igual, mas coloquei pra mostrar q dá
 public class Cliente {
 
+    @Id //define a primary key
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID") //não precisa colocar pq o nome do campo é igual
     private Integer id;
+
+    @Column(name = "nome", length = 100/*, updatable = false*/)
     private String nome;
 
     public Cliente() {

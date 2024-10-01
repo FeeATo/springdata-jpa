@@ -22,3 +22,5 @@ CREATE TABLE ITEM_PEDIDO (
     PRODUTO_ID INTEGER REFERENCES PRODUTO(ID),
     QUANTIDADE INTEGER
 );
+
+--Quando usamos JPA, não precisa desse cara porque ele já leva as entidades pro banco

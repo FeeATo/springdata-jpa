@@ -1,10 +1,13 @@
 package io.github.FeeATo.domain.repository;
 
 import io.github.FeeATo.domain.entity.Cliente;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,50 +16,47 @@ import java.util.List;
 @Repository //ele é um component e também essa classe  tem o exception translator
 public class ClientesRepository {
 
-    private static String INSERT = "insert into cliente (nome) values (?)";
-    private static String SELECT_ALL = "select * from cliente";
-    private static String UPDATE = "update cliente set nome = ? where id = ?";
-    private static String DELETE = "delete from cliente where id = ?";
-    private static String SELECT_BY_NAME = "select * from cliente where nome like ?";
-
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private EntityManager entityManager; //faz todas as operações
 
-    public Cliente salvar(Cliente cliente) {
-        jdbcTemplate.update(INSERT, cliente.getNome());
+
+    @Transactional //precisa de uma transação pra persistir na base de dados
+    public Cliente salvar(Cliente cliente) { //quando a classe entidade não foi salva, ela é uma entidade TRANSIENTE. (o JPA não está gerenciando ela ainda)
+        entityManager.persist(cliente);
         return cliente;
     }
 
+    @Transactional(readOnly = true)
     public List<Cliente> obterTodos() {
-        return jdbcTemplate.query(SELECT_ALL, getClienteRowMapper());
+        return entityManager.createQuery("from Cliente", Cliente.class).getResultList();
     }
 
-    private static RowMapper<Cliente> getClienteRowMapper() {
-        return new RowMapper<Cliente>() {
-            @Override
-            public Cliente mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return new Cliente(rs.getInt("ID"), rs.getString("NOME"));
-            }
-        };
-    }
-
+    @Transactional(readOnly = true) //é mais optimizado
     public List<Cliente> listarPorNome(String nome) {
-        return jdbcTemplate.query(SELECT_BY_NAME,
-                new Object[]{"%"+nome+"%"},
-                getClienteRowMapper());
+        String jpql = "SELECT c FROM Cliente c WHERE c.nome = :nome";
+        TypedQuery<Cliente> query = entityManager.createQuery(jpql, Cliente.class);
+        query.setParameter("nome", "%"+nome+"%");
+        return query.getResultList();
     }
 
+    @Transactional
     public Cliente atualizar(Cliente cliente) {
-        jdbcTemplate.update(UPDATE, cliente.getNome(), cliente.getId());
+        entityManager.merge(cliente);
         return cliente;
     }
 
+    @Transactional
     public void deletar(Cliente cliente) {
-        deletar(cliente.getId());
+        if (!entityManager.contains(cliente)) {
+            cliente = entityManager.merge(cliente);
+        }
+        entityManager.remove(cliente);
     }
 
+    @Transactional
     public void deletar(Integer id) {
-        jdbcTemplate.update(DELETE, id);
+        Cliente cliente = entityManager.find(Cliente.class, id); //busca pela chave primária
+        entityManager.remove(cliente);
     }
 
 }

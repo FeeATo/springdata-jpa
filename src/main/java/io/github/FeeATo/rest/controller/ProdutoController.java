@@ -1,38 +1,32 @@
 package io.github.FeeATo.rest.controller;
 
-import io.github.FeeATo.domain.entity.Cliente;
+import io.github.FeeATo.domain.entity.Produto;
 import io.github.FeeATo.rest.exception.VendasException;
-import io.github.FeeATo.rest.model.Response;
-import io.github.FeeATo.rest.service.ClienteService;
+import io.github.FeeATo.rest.service.ProdutoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/clientes")
-public class ClienteController {
+@RequestMapping("/api/produtos")
+public class ProdutoController {
 
-    private ClienteService clienteService;
 
-    public ClienteController(ClienteService clienteService) { //o spring vai injetar automaticamente
-        this.clienteService = clienteService;
+    private ProdutoService produtoService;
+
+    public ProdutoController(ProdutoService produtoService) {
+        this.produtoService = produtoService;
     }
 
-    //    @RequestMapping(
-//            value = {"/hello/{nome}", "/hell/{nome}"}, //pode ser mais de um endpoint aqui
-//            method = RequestMethod.GET,
-//            consumes = {"application/json", "application/xml"}, //dá pra fazer isso; O padrão é json. Pra GET, não precisa disso.
-//            produces = {"application/json", "application/xml"} //dá pra fazer isso tbm
-//    )
-    @GetMapping(value = "/hello/{nome}") //msm coisa que as duas de cima juntas
-    public String helloCliente(@PathVariable("nome") String nomeCliente) {
-        return String.format("Hello %s", nomeCliente);
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello produtos";
     }
 
-    @GetMapping(value = "/{id}") //msm coisa que as duas de cima juntas
-    public Response getClienteById(@PathVariable("id") Integer id) {  /*se o nome do parametro é o msm do path, não precisa desse PathVariable*/
+    @GetMapping("/{id}")
+    public Produto getProdutoById(@PathVariable Integer id){
         try {
-            return clienteService.getClienteById(id);
+            return produtoService.getProdutoById(id);
         } catch (VendasException ve) {
             if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.BAD_REQ)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ve.getMessage());
@@ -46,26 +40,14 @@ public class ClienteController {
 
     @PostMapping(value = {"/", ""})
     @ResponseStatus(HttpStatus.CREATED)
-    public Response save(@RequestBody Cliente cliente) {
+    public Produto save(@RequestBody Produto produto) {
         try {
-            return clienteService.save(cliente);
+            return produtoService.save(produto);
         } catch (VendasException ve) {
             if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.BAD_REQ)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ve.getMessage());
-            } else {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ve.getMessage());
-            }
-        }
-    }
-
-    @DeleteMapping(value = {"/{id}"})
-    @ResponseStatus(HttpStatus.OK)
-    public Response delete(@PathVariable Integer id) {
-        try {
-            return clienteService.delete(id);
-        } catch (VendasException ve) {
-            if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.BAD_REQ)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ve.getMessage());
+            } else if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.NOT_FOUND)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, ve.getMessage());
             } else {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ve.getMessage());
             }
@@ -74,20 +56,34 @@ public class ClienteController {
 
     @PutMapping(value = {"/", ""})
     @ResponseStatus(HttpStatus.OK)
-    public Response update(@RequestBody Cliente cliente) {
+    public Produto update(@RequestBody Produto produto) {
         try {
-            return clienteService.update(cliente);
+            return produtoService.update(produto);
         } catch (VendasException ve) {
             if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.BAD_REQ)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ve.getMessage());
+            } else if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.NOT_FOUND)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, ve.getMessage());
             } else {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ve.getMessage());
             }
         }
     }
 
-    @GetMapping(value = {"/", ""})
-    public Response find(Cliente filtro) {
-        return clienteService.find(filtro);
+    @DeleteMapping(value = {"/", ""})
+    @ResponseStatus(HttpStatus.OK)
+    public void delete(@PathVariable Integer id) throws VendasException {
+        try {
+            produtoService.delete(id);
+        } catch (VendasException ve) {
+            if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.BAD_REQ)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ve.getMessage());
+            } else if (ve.getExceptionEnum().equals(VendasException.VendasExceptionEnum.NOT_FOUND)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, ve.getMessage());
+            } else {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ve.getMessage());
+            }
+        }
     }
+
 }

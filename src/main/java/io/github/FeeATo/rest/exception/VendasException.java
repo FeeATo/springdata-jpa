@@ -1,4 +1,4 @@
-package io.github.FeeATo.rest.controller.exception;
+package io.github.FeeATo.rest.exception;
 
 public class VendasException extends Exception {
 

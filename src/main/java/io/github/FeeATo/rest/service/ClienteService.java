@@ -1,14 +1,15 @@
-package io.github.FeeATo.rest.controller;
+package io.github.FeeATo.rest.service;
 
 import io.github.FeeATo.domain.entity.Cliente;
 import io.github.FeeATo.domain.repository.ClientesRepository;
-import io.github.FeeATo.rest.controller.exception.VendasException;
-import io.github.FeeATo.rest.controller.model.Response;
+import io.github.FeeATo.rest.exception.VendasException;
+import io.github.FeeATo.rest.model.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -57,5 +58,14 @@ public class ClienteService {
                 .findById(id)
                 .map(Response::new)
                 .orElseThrow(()-> new VendasException("Cliente não encontrado", VendasException.VendasExceptionEnum.NOT_FOUND));
+    }
+
+    public Response find(Cliente filtro) {
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example example = Example.of(filtro, matcher);
+        List<Cliente> clienteList = clientesRepository.findAll(example);
+        return new Response(clienteList);
     }
 }

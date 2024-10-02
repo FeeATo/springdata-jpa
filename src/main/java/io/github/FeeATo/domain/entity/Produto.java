@@ -1,11 +1,19 @@
 package io.github.FeeATo.domain.entity;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "produto")
 public class Produto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @Column
     private String descricao;
+    @Column
     private BigDecimal preco;
 
     public Integer getId() {

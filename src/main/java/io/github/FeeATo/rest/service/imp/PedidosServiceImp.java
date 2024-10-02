@@ -3,6 +3,7 @@ package io.github.FeeATo.rest.service.imp;
 import io.github.FeeATo.domain.entity.ItemPedido;
 import io.github.FeeATo.domain.entity.Pedido;
 import io.github.FeeATo.domain.entity.Produto;
+import io.github.FeeATo.domain.enums.PedidoStatus;
 import io.github.FeeATo.domain.repository.ClientesRepository;
 import io.github.FeeATo.domain.repository.ItemPedidoRepository;
 import io.github.FeeATo.domain.repository.PedidoRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,8 +39,7 @@ public class PedidosServiceImp implements PedidoService {
             Pedido pedido = montaPedido(pedidoDTO);
             pedidoRepository.save(pedido);
             itemPedidoRepository.saveAll(pedido.getItensPedido());
-
-            return montaPedidoDTO(pedido);
+            return convertePedidoDTO(pedido);
         } catch (VendasRuntimeException vne) {
             throw vne;
         } catch (Exception ex) {
@@ -46,25 +47,50 @@ public class PedidosServiceImp implements PedidoService {
         }
     }
 
-    private PedidoDTO montaPedidoDTO(Pedido pedido) {
+    @Override
+    public PedidoDTO getPedidoById(Integer id) {
+        Pedido pedido = getPedido(id);
+
+        return convertePedidoDTO(pedido);
+    }
+
+    private Pedido getPedido(Integer id) {
+        return pedidoRepository
+                .findByIdFetchCliente(id)
+                .orElseThrow(() -> new VendasRuntimeException("Pedido não encontrado"));
+    }
+
+    @Override
+    public PedidoDTO cancelarPedido(Integer id) {
+        Pedido pedido = getPedido(id);
+        pedido.setPedidoStatus(PedidoStatus.CANCELADO);
+        return convertePedidoDTO(pedidoRepository.save(pedido));
+    }
+
+    private PedidoDTO convertePedidoDTO(Pedido pedido) {
         PedidoDTO pedidoDTO = new PedidoDTO(pedido.getId());
         pedidoDTO.setItens(pedido.getItensPedido().stream().map(i->new ItemPedidoDTO(new ProdutoDTO(i.getProduto()), i.getQuantidade())).collect(Collectors.toList()));
-        pedidoDTO.setTotal(pedido.getItensPedido().stream().map(i->{
-            return i.getProduto().getPreco().multiply(BigDecimal.valueOf(i.getQuantidade()));
-        }).reduce(BigDecimal::add).map(BigDecimal::doubleValue).orElse(0.0));
+        pedidoDTO.setStatus(pedido.getPedidoStatus().name());
+        if (pedido.getPedidoStatus().equals(PedidoStatus.CONFIRMADO)) {
+            pedidoDTO.setTotal(pedido.getItensPedido().stream().map(i -> {
+                return i.getProduto().getPreco().multiply(BigDecimal.valueOf(i.getQuantidade()));
+            }).reduce(BigDecimal::add).map(BigDecimal::doubleValue).orElse(0.0));
+        }
+        pedidoDTO.setCliente(pedido.getCliente());
+        pedidoDTO.setDataPedido(pedido.getDataPedido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         return pedidoDTO;
     }
 
     private Pedido montaPedido(PedidoDTO pedidoDTO) {
         Pedido pedido = new Pedido();
         pedido.setCliente(clientesRepository
-                .findById(pedidoDTO.getCliente())
+                .findById(pedidoDTO.getClienteId())
                 .orElseThrow(() -> new VendasRuntimeException("Cliente não encontrado para criar pedido")));
 
         Map<Integer, Produto> produtoMap = new HashMap<>();
         List<ItemPedido> itemPedidoList = new ArrayList<>();
         for (ItemPedidoDTO item : pedidoDTO.getItens()) {
-            Produto produto = produtoMap.get(item.getProduto());
+            Produto produto = produtoMap.get(item.getProdutoId());
             if (produto == null) {
                 produto = produtosRepository
                         .findById(item.getProdutoId())
@@ -76,6 +102,7 @@ public class PedidosServiceImp implements PedidoService {
             itemPedidoList.add(new ItemPedido(pedido, produto, item.getQuantidade()));
         }
         pedido.setItensPedido(itemPedidoList);
+        pedido.setPedidoStatus(PedidoStatus.CONFIRMADO);
         return pedido;
     }
 }

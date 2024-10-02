@@ -1,5 +1,6 @@
 package io.github.FeeATo.domain.entity;
 
+import io.github.FeeATo.domain.enums.PedidoStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +24,10 @@ public class Pedido {
     private Cliente cliente;
     @Column(name = "data_pedido")
     private LocalDate dataPedido;
-
     @OneToMany(mappedBy = "pedido")
     private List<ItemPedido> itensPedido;
+    @Enumerated(EnumType.STRING)
+    private PedidoStatus pedidoStatus;
 
     public Pedido() {
         dataPedido = LocalDate.now();

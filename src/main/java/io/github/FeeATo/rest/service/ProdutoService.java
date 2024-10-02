@@ -18,25 +18,18 @@ public class ProdutoService {
     @Autowired
     private ProdutosRepository produtosRepository;
 
-    public Produto getProdutoById(Integer id) throws VendasException {
-
-        try {
-            if (id == null) {
-                throw new VendasRuntimeException("ID não pode ser nulo", VendasEnumException.BAD_REQ);
-            }
-
-            return produtosRepository
-                    .findById(id)
-                    .orElseThrow(() -> new VendasRuntimeException("Produto não encontrado", VendasEnumException.NOT_FOUND));
-        } catch (VendasRuntimeException vne) {
-            throw vne;
-        } catch (Exception ex) {
-            throw new VendasException("Erro ao buscar produto por id", ex);
+    public Produto getProdutoById(Integer id) {
+        if (id == null) {
+            throw new VendasRuntimeException("ID não pode ser nulo", VendasEnumException.BAD_REQ);
         }
+        return produtosRepository
+                .findById(id)
+                .orElseThrow(() -> new VendasRuntimeException("Produto não encontrado", VendasEnumException.NOT_FOUND));
+
     }
 
     public Produto save(Produto produto) {
-        if (produto.getId()!=null) {
+        if (produto.getId() != null) {
             throw new VendasRuntimeException("Produto já cadastrado");
         }
 
@@ -50,22 +43,22 @@ public class ProdutoService {
 
         return produtosRepository
                 .findById(produto.getId())
-                .map(p->produtosRepository.save(produto))
-                .orElseThrow(()->new VendasRuntimeException("Produto não encontrado"));
+                .map(p -> produtosRepository.save(produto))
+                .orElseThrow(() -> new VendasRuntimeException("Produto não encontrado"));
     }
 
-    public void delete(Integer id){
+    public void delete(Integer id) {
         if (id == null) {
             throw new VendasRuntimeException("ID não pode ser nulo");
         }
 
         produtosRepository
                 .findById(id)
-                .map(p->{
+                .map(p -> {
                     produtosRepository.delete(p);
                     return Void.TYPE;
                 })
-                .orElseThrow(()-> new VendasRuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new VendasRuntimeException("Produto não encontrado"));
     }
 
     public List<Produto> find(Produto filtro) {

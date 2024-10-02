@@ -3,6 +3,7 @@ package io.github.FeeATo.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,7 @@ public class Cliente {
     private Integer id;
 
     @Column(name = "nome", length = 100/*, updatable = false*/)
+    @NotEmpty(message = "Campo nome é obrigatório")
     private String nome;
 
     @Column(name = "cpf", length = 11)

@@ -1,8 +1,11 @@
 package io.github.FeeATo.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.FeeATo.domain.entity.Cliente;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /*
@@ -23,8 +26,13 @@ import java.util.List;
 public class PedidoDTO {
 
     private final Integer id;
-    private Integer cliente;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer clienteId;
+    private Cliente cliente;
     private List<ItemPedidoDTO> itens;
+    private String dataPedido;
+    private String status;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Double total;
 
     public PedidoDTO() {

@@ -1,6 +1,7 @@
 package io.github.FeeATo.domain.repository;
 
 import io.github.FeeATo.domain.entity.Cliente;
+import io.github.FeeATo.rest.dto.PedidoDTO;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientesRepository extends JpaRepository<Cliente, Integer> {
 

@@ -1,4 +1,4 @@
-package io.github.FeeATo.rest.model;
+package io.github.FeeATo.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

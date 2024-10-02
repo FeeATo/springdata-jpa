@@ -2,7 +2,9 @@ package io.github.FeeATo.rest.service;
 
 import io.github.FeeATo.domain.entity.Cliente;
 import io.github.FeeATo.domain.repository.ClientesRepository;
+import io.github.FeeATo.rest.exception.VendasEnumException;
 import io.github.FeeATo.rest.exception.VendasException;
+import io.github.FeeATo.rest.exception.VendasRuntimeException;
 import io.github.FeeATo.rest.model.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -18,54 +20,50 @@ public class ClienteService {
     @Autowired
     ClientesRepository clientesRepository;
 
-    public Response save(Cliente cliente) throws VendasException {
-
+    public Cliente save(Cliente cliente) {
         if (cliente.getId() != null) {
-            throw new VendasException("Cliente já cadastrado");
+            throw new VendasRuntimeException("Cliente já cadastrado");
         }
 
-        return new Response("Cliente cadastrado com sucesso", clientesRepository.save(cliente));
+        return clientesRepository.save(cliente);
     }
 
-    public Response delete(Integer id) throws VendasException {
+    public void delete(Integer id) {
         Optional<Cliente> cliente = clientesRepository.findById(id);
         if (cliente.isPresent()) {
             clientesRepository.delete(cliente.get());
-            return new Response("Cliente deletado com sucesso");
         } else {
-            throw new VendasException("Cliente não encontrado");
+            throw new VendasRuntimeException("Cliente não encontrado");
         }
     }
 
-    public Response update(Cliente cliente) throws VendasException {
+    public Cliente update(Cliente cliente) {
         if (cliente.getId() == null) {
-            throw new VendasException("O cliente precisa ter um ID para poder ser atualizado");
+            throw new VendasRuntimeException("O cliente precisa ter um ID para poder ser atualizado");
         }
         Optional<Cliente> clienteOptional = clientesRepository.findById(cliente.getId());
         if (clienteOptional.isPresent()) {
-            cliente = clientesRepository.save(cliente);
-            return new Response("Cliente atualizado com sucesso", cliente);
+            return clientesRepository.save(cliente);
         }
-        throw new VendasException("Cliente não encontrado");
+        throw new VendasRuntimeException("Cliente não encontrado");
 
     }
 
-    public Response getClienteById(Integer id) throws VendasException {
+    public Cliente getClienteById(Integer id) {
         if (id == null) {
-            throw new VendasException("ID não pode ser nulo");
+            throw new VendasRuntimeException("ID não pode ser nulo");
         }
         return clientesRepository
                 .findById(id)
-                .map(Response::new)
-                .orElseThrow(()-> new VendasException("Cliente não encontrado", VendasException.VendasExceptionEnum.NOT_FOUND));
+                .orElseThrow(()-> new VendasRuntimeException("Cliente não encontrado", VendasEnumException.NOT_FOUND));
     }
 
-    public Response find(Cliente filtro) {
+    public List<Cliente> find(Cliente filtro) {
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example example = Example.of(filtro, matcher);
-        List<Cliente> clienteList = clientesRepository.findAll(example);
-        return new Response(clienteList);
+        List<Cliente> clientes = clientesRepository.findAll(example);
+        return clientes;
     }
 }

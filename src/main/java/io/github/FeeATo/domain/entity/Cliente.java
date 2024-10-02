@@ -3,6 +3,8 @@ package io.github.FeeATo.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
@@ -10,6 +12,8 @@ import java.util.Set;
 
 @Entity //diz que isso é uma entidade/tabela para o JPA
 @Table(name = "cliente") //não precisaria pq o nome é igual, mas coloquei pra mostrar q dá
+@Getter
+@Setter
 public class Cliente {
 
     @Id //define a primary key
@@ -30,6 +34,10 @@ public class Cliente {
     public Cliente() {
     }
 
+    public Cliente(Integer id) {
+        this.id = id;
+    }
+
     public Cliente(String nome) {
         this.nome = nome;
     }
@@ -37,39 +45,6 @@ public class Cliente {
     public Cliente(Integer id, String nome) {
         this.id = id;
         this.nome = nome;
-    }
-
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public Set<Pedido> getPedidos() {
-        return pedidos;
-    }
-
-    public void setPedidos(Set<Pedido> pedidos) {
-        this.pedidos = pedidos;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
     }
 
     @Override

@@ -1,11 +1,16 @@
 package io.github.FeeATo.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @Table(name = "produto")
+@Getter
+@Setter
 public class Produto {
 
     @Id
@@ -16,27 +21,28 @@ public class Produto {
     @Column
     private BigDecimal preco;
 
-    public Integer getId() {
-        return id;
+    public Produto() {
     }
 
-    public void setId(Integer id) {
+    public Produto(Integer id) {
         this.id = id;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
+    public Produto(String descricao, BigDecimal preco) {
         this.descricao = descricao;
-    }
-
-    public BigDecimal getPreco() {
-        return preco;
-    }
-
-    public void setPreco(BigDecimal preco) {
         this.preco = preco;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Produto produto = (Produto) object;
+        return Objects.equals(id, produto.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, descricao, preco);
     }
 }

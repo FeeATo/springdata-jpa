@@ -1,20 +1,20 @@
 package io.github.FeeATo.rest.exception;
 
-public class VendasException extends Exception {
+public class VendasRuntimeException extends RuntimeException {
 
     private VendasEnumException exceptionEnum;
 
-    public VendasException(String message) {
+    public VendasRuntimeException(String message) {
         super(message);
         exceptionEnum = VendasEnumException.BAD_REQ;
     }
 
-    public VendasException(String message, Throwable cause) {
+    public VendasRuntimeException(String message, Throwable cause) {
         super(message, cause);
         exceptionEnum = VendasEnumException.INTERNAL_ERROR;
     }
 
-    public VendasException(String message, VendasEnumException exceptionEnum) {
+    public VendasRuntimeException(String message, VendasEnumException exceptionEnum) {
         super(message);
         this.exceptionEnum = exceptionEnum;
     }
@@ -27,5 +27,4 @@ public class VendasException extends Exception {
         this.exceptionEnum = exceptionEnum;
     }
 
-    
 }

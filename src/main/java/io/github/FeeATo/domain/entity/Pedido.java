@@ -1,13 +1,18 @@
 package io.github.FeeATo.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "pedido")
+@Getter
+@Setter
 public class Pedido {
 
     @Id
@@ -18,50 +23,12 @@ public class Pedido {
     private Cliente cliente;
     @Column(name = "data_pedido")
     private LocalDate dataPedido;
-    @Column(name = "total", scale = 2, precision = 20) //precision é a quantidade de dígitos que tem o número. O scale é a quantidade de casas decimais
-    private BigDecimal total;
 
     @OneToMany(mappedBy = "pedido")
-    private Set<ItemPedido> itensPedido;
+    private List<ItemPedido> itensPedido;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public LocalDate getDataPedido() {
-        return dataPedido;
-    }
-
-    public void setDataPedido(LocalDate dataPedido) {
-        this.dataPedido = dataPedido;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public Set<ItemPedido> getItensPedido() {
-        return itensPedido;
-    }
-
-    public void setItensPedido(Set<ItemPedido> itensPedido) {
-        this.itensPedido = itensPedido;
+    public Pedido() {
+        dataPedido = LocalDate.now();
     }
 
     @Override
@@ -70,7 +37,6 @@ public class Pedido {
                 "id=" + id +
                 ", cliente=" + cliente +
                 ", dataPedido=" + dataPedido +
-                ", total=" + total +
                 '}';
     }
 }

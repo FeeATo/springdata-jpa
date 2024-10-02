@@ -3,32 +3,34 @@ package io.github.FeeATo.rest.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.FeeATo.domain.entity.Cliente;
+import io.github.FeeATo.domain.entity.Produto;
 
 import java.util.List;
 
-public class Response {
+public class Response<T> {
 
-    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String mensagem;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<Cliente> clientes;
+    private List<T> results;
+
 
     public Response(String mensagem) {
         this.mensagem = mensagem;
     }
 
-    public Response(Cliente clientes) {
-        this.clientes = List.of(clientes);
+    public Response(T obj) {
+        this.results = List.of(obj);
     }
 
-    public Response(String mensagem, Cliente clientes) {
+    public Response(String mensagem, T obj) {
         this.mensagem = mensagem;
-        this.clientes = List.of(clientes);
+        this.results = List.of(obj);
     }
 
-    public Response(List<Cliente> clientes) {
-        this.clientes = clientes;
+    public Response(List<T> elements) {
+        this.results = elements;
     }
 
     public String getMensagem() {
@@ -39,11 +41,11 @@ public class Response {
         this.mensagem = mensagem;
     }
 
-    public List<Cliente> getClientes() {
-        return clientes;
+    public List<T> getResults() {
+        return results;
     }
 
-    public void setClientes(Cliente clientes) {
-        this.clientes = List.of(clientes);
+    public void setResults(List<T> results) {
+        this.results = results;
     }
 }

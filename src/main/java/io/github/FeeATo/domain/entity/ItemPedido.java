@@ -21,6 +21,20 @@ public class ItemPedido {
     @Column
     private Integer quantidade;
 
+    public ItemPedido() {
+    }
+
+    public ItemPedido(Pedido pedido, Produto produto, Integer quantidade) {
+        this.pedido = pedido;
+        this.produto = produto;
+        this.quantidade = quantidade;
+    }
+
+    public ItemPedido(Produto produto, Integer quantidade) {
+        this.produto = produto;
+        this.quantidade = quantidade;
+    }
+
     public Integer getId() {
         return id;
     }

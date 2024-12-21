@@ -8,9 +8,12 @@ import java.util.List;
 
 public interface PedidoService {
 
-    PedidoDTO salvar(PedidoDTO pedidoDTO) throws VendasException;
+    Pedido salvar(Pedido pedido) throws VendasException;
+    Pedido salvar(PedidoDTO pedido) throws VendasException;
 
-    PedidoDTO getPedidoById(Integer id);
+    Pedido getPedidoById(Integer id);
+    List<Pedido> getPedidosByProdutoId(Integer produtoId);
 
-    PedidoDTO cancelarPedido(Integer id);
+    Pedido cancelarPedido(Integer id);
+    Pedido cancelarPedido(Pedido pedido);
 }

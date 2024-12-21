@@ -34,12 +34,10 @@ public class PedidosServiceImp implements PedidoService {
 
     @Override
     @Transactional //garante que OU ele salva TUDO (pedido e itens pedido) ou ele n salva nd, porque se der erro o Spring vai dar rollback na transaction
-    public PedidoDTO salvar(PedidoDTO pedidoDTO) throws VendasException {
+    public Pedido salvar(PedidoDTO pedidoDTO) throws VendasException {
         try {
             Pedido pedido = montaPedido(pedidoDTO);
-            pedidoRepository.save(pedido);
-            itemPedidoRepository.saveAll(pedido.getItensPedido());
-            return convertePedidoDTO(pedido);
+            return salvar(pedido);
         } catch (VendasRuntimeException vne) {
             throw vne;
         } catch (Exception ex) {
@@ -48,10 +46,27 @@ public class PedidosServiceImp implements PedidoService {
     }
 
     @Override
-    public PedidoDTO getPedidoById(Integer id) {
-        Pedido pedido = getPedido(id);
+    @Transactional
+    public Pedido salvar(Pedido pedido) throws VendasException {
+        try {
+            pedidoRepository.save(pedido);
+            itemPedidoRepository.saveAll(pedido.getItensPedido());
+            return pedido;
+        } catch (VendasRuntimeException vne) {
+            throw vne;
+        } catch (Exception ex) {
+            throw new VendasException("Erro ao salvar pedido", ex);
+        }
+    }
 
-        return convertePedidoDTO(pedido);
+    @Override
+    public Pedido getPedidoById(Integer id) {
+        return getPedido(id);
+    }
+
+    @Override
+    public List<Pedido> getPedidosByProdutoId(Integer produtoId) {
+        return pedidoRepository.findByProdutoId(produtoId).orElse(null);
     }
 
     private Pedido getPedido(Integer id) {
@@ -61,24 +76,15 @@ public class PedidosServiceImp implements PedidoService {
     }
 
     @Override
-    public PedidoDTO cancelarPedido(Integer id) {
+    public Pedido cancelarPedido(Integer id) {
         Pedido pedido = getPedido(id);
-        pedido.setPedidoStatus(PedidoStatus.CANCELADO);
-        return convertePedidoDTO(pedidoRepository.save(pedido));
+        return cancelarPedido(pedido);
     }
 
-    private PedidoDTO convertePedidoDTO(Pedido pedido) {
-        PedidoDTO pedidoDTO = new PedidoDTO(pedido.getId());
-        pedidoDTO.setItens(pedido.getItensPedido().stream().map(i->new ItemPedidoDTO(new ProdutoDTO(i.getProduto()), i.getQuantidade())).collect(Collectors.toList()));
-        pedidoDTO.setStatus(pedido.getPedidoStatus().name());
-        if (pedido.getPedidoStatus().equals(PedidoStatus.CONFIRMADO)) {
-            pedidoDTO.setTotal(pedido.getItensPedido().stream().map(i -> {
-                return i.getProduto().getPreco().multiply(BigDecimal.valueOf(i.getQuantidade()));
-            }).reduce(BigDecimal::add).map(BigDecimal::doubleValue).orElse(0.0));
-        }
-        pedidoDTO.setCliente(pedido.getCliente());
-        pedidoDTO.setDataPedido(pedido.getDataPedido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        return pedidoDTO;
+    @Override
+    public Pedido cancelarPedido(Pedido pedido) {
+        pedido.setPedidoStatus(PedidoStatus.CANCELADO);
+        return pedidoRepository.save(pedido);
     }
 
     private Pedido montaPedido(PedidoDTO pedidoDTO) {
@@ -99,7 +105,7 @@ public class PedidosServiceImp implements PedidoService {
             produtoMap.put(item.getProdutoId(),
                     produto);
 
-            itemPedidoList.add(new ItemPedido(pedido, produto, item.getQuantidade()));
+            itemPedidoList.add(new ItemPedido(pedido, null, produto, item.getQuantidade()));
         }
         pedido.setItensPedido(itemPedidoList);
         pedido.setPedidoStatus(PedidoStatus.CONFIRMADO);

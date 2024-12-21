@@ -1,9 +1,15 @@
 package io.github.FeeATo.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "item_pedido")
+@Getter
+@Setter
 public class ItemPedido {
 
     @Id
@@ -13,7 +19,8 @@ public class ItemPedido {
     @ManyToOne
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;
-
+    @Column(name = "preco")
+    private BigDecimal preco;
     @ManyToOne
     @JoinColumn(name = "produto_id")
     private Produto produto;
@@ -24,46 +31,15 @@ public class ItemPedido {
     public ItemPedido() {
     }
 
-    public ItemPedido(Pedido pedido, Produto produto, Integer quantidade) {
+    public ItemPedido(Pedido pedido, BigDecimal preco, Produto produto, Integer quantidade) {
         this.pedido = pedido;
         this.produto = produto;
+        this.preco = preco;
         this.quantidade = quantidade;
     }
 
     public ItemPedido(Produto produto, Integer quantidade) {
         this.produto = produto;
-        this.quantidade = quantidade;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
-    public Integer getQuantidade() {
-        return quantidade;
-    }
-
-    public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
     }
 }

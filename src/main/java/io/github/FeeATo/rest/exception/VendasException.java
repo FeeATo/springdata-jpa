@@ -11,6 +11,9 @@ public class VendasException extends Exception {
 
     public VendasException(String message, Throwable cause) {
         super(message, cause);
+        if (cause != null) {
+            cause.printStackTrace();
+        }
         exceptionEnum = VendasEnumException.INTERNAL_ERROR;
     }
 

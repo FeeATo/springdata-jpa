@@ -1,10 +1,8 @@
 package io.github.FeeATo.rest.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import io.github.FeeATo.domain.entity.ItemPedido;
 import lombok.*;
 
 @Getter
@@ -14,14 +12,20 @@ public class ItemPedidoDTO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer produtoId;
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private ProdutoDTO produto;
-
     private Integer quantidade;
+    private Double preco;
 
-    public ItemPedidoDTO(ProdutoDTO produto, Integer quantidade) {
+    public ItemPedidoDTO(ProdutoDTO produto, Integer quantidade, Double preco) {
         this.produto = produto;
         this.quantidade = quantidade;
+        this.preco = preco;
+    }
+
+    public static ItemPedidoDTO convertDTO(ItemPedido itemPedido) {
+        return new ItemPedidoDTO(ProdutoDTO.convertDTO(itemPedido.getProduto()),
+                itemPedido.getQuantidade(),
+                itemPedido.getPreco().doubleValue());
     }
 }

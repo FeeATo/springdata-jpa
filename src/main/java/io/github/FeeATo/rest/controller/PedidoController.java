@@ -17,19 +17,19 @@ public class PedidoController {
     }
 
     @PostMapping(value = {"/", ""})
-    public Response<PedidoDTO> createPedido(@RequestBody PedidoDTO pedido) throws VendasException {
-        return new Response<PedidoDTO>("Pedido criado com sucesso", pedidoService.salvar(pedido));
+    public Response<PedidoDTO> createPedido(@RequestBody PedidoDTO pedidoDTO) throws VendasException {
+        return new Response<PedidoDTO>("Pedido criado com sucesso", PedidoDTO.convertDTO(pedidoService.salvar(pedidoDTO)));
     }
 
     @GetMapping(value = "/{id}")
     public Response<PedidoDTO> getPedidoById(@PathVariable Integer id) {
-        return new Response<PedidoDTO>(pedidoService.getPedidoById(id));
+        return new Response<PedidoDTO>(PedidoDTO.convertDTO(pedidoService.getPedidoById(id)));
     }
 
 
     @PatchMapping(value = {"/{id}"})
     public Response<PedidoDTO> cancelarPedido(@PathVariable Integer id) {
-        return new Response<PedidoDTO>(pedidoService.cancelarPedido(id));
+        return new Response<PedidoDTO>(PedidoDTO.convertDTO(pedidoService.cancelarPedido(id)));
     }
 
 }

@@ -19,4 +19,9 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
             " WHERE p.id=:id ")
     Optional<Pedido> findByIdFetchCliente(@Param("id") Integer id);
 
+    @Query("select p from Pedido p" +
+            " JOIN FETCH p.itensPedido ip" +
+            " JOIN FETCH ip.produto pro" +
+            " WHERE pro.id=:produtoId")
+    Optional<List<Pedido>> findByProdutoId(@Param("produtoId") Integer produtoId);
 }

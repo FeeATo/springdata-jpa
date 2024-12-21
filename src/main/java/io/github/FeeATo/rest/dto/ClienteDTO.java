@@ -1,10 +1,12 @@
 package io.github.FeeATo.rest.dto;
 
 import io.github.FeeATo.domain.entity.Cliente;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +18,9 @@ import java.util.stream.Collectors;
 public class ClienteDTO {
 
     private Integer id;
+    @NotEmpty
     private String nome;
+    @CPF
     private String cpf;
 
     public static ClienteDTO convertDTO(Cliente cliente) {

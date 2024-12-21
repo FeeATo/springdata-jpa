@@ -32,7 +32,7 @@ public class Cliente {
     private String nome;
 
     @Column(name = "cpf", length = 11)
-    @NotEmpty
+    @NotEmpty(message = "CPF não pode ser nulo")
     @CPF(message = "CPF inválido")
     private String cpf;
 
